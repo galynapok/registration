@@ -70,8 +70,6 @@ databese secters, iam user to wit access to created resources.
               "airflow" = {
                   name    = "clienta-org-airflow"
                   cluster_size              = 2,
-                  engine          = "aurora-postgresql",
-                  cluster_family  = "aurora-postgresql9.6",
                   create_random_db_password = true,
                   instance_type             = "db.t2.small",
                   security_groups           = [],
@@ -83,8 +81,6 @@ databese secters, iam user to wit access to created resources.
                   name    = "clienta-org-bioanalyze"
                   cluster_size              = 2,
                   create_random_db_password = true,
-                  engine          = "aurora-postgresql",
-                  cluster_family  = "aurora-postgresql9.6",
                   instance_type             = "db.t2.small",
                   security_groups           = [],
                   retention_period          = 5,
