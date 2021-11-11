@@ -55,7 +55,8 @@ For a complete example, see [examples/complete](examples/complete).
 
 For automated tests of the complete example using [bats](https://github.com/bats-core/bats-core) and [Terratest](https://github.com/gruntwork-io/terratest) (which tests and deploys the example on AWS), see [test](test).
 
-This example creates a new `String` parameter called `/cp/prod/app/database/master_password` with the value of `password1`.
+This example creates: terraform state backend, S3 bucket for user resources, two AWS RDS Aurora Postgresql databases, AWS Secrets manager to store 
+databese secters, iam user to wit access to created resources.  
 
 ```hcl
       module "registration" {
