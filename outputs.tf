@@ -3,11 +3,6 @@ output "aurora_endpoints" {
   value = [for item in module.rds_cluster_aurora: try(item.endpoint, "")]
 }
 
-output "s3" {
-  value = "test"
-  description = "Normalized environment"
-}
-
 output "user" {
   value = try(module.aws_user.user_name, "") 
 }

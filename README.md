@@ -104,7 +104,6 @@
 | <a name="output_aws_elb_bioanalyze_app"></a> [aws\_elb\_bioanalyze\_app](#output\_aws\_elb\_bioanalyze\_app) | n/a |
 | <a name="output_bioanalyze_endpoint_lb"></a> [bioanalyze\_endpoint\_lb](#output\_bioanalyze\_endpoint\_lb) | n/a |
 | <a name="output_db_secrets"></a> [db\_secrets](#output\_db\_secrets) | n/a |
-| <a name="output_s3"></a> [s3](#output\_s3) | Normalized environment |
 | <a name="output_s3_bucket"></a> [s3\_bucket](#output\_s3\_bucket) | n/a |
 | <a name="output_secret_access_key"></a> [secret\_access\_key](#output\_secret\_access\_key) | n/a |
 | <a name="output_user"></a> [user](#output\_user) | n/a |
