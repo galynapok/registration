@@ -1,9 +1,4 @@
 ##################################################
-# Variables
-# This file has various groupings of variables
-##################################################
-
-##################################################
 # AWS
 ##################################################
 
@@ -13,59 +8,62 @@ variable "region" {
   description = "AWS Region"
 }
 
-##################################################
-# AWS EKS - Kubernetes Cluster
-# Most of the time we will just pass in a provider
-##################################################
-
-variable "eks_cluster_id" {
-  description = "EKS Cluster Id - This cluster must exist."
+variable "path" {
   type        = string
+  description = "Path in which to create the user"
+  default     = "/"
 }
 
-variable "eks_cluster_oidc_issuer_url" {
-  description = "URL to the oidc issuer. The cluster must have been created with :   oidc_provider_enabled = true"
+variable "vpc_id" {
   type        = string
+  description = ""
+  default     = ""
 }
 
-##################################################
-# Helm Release Variables
-# corresponds to input to resource "helm_release"
-##################################################
+variable "subnets" {
+  type        = list
+  description = ""
+  default     = []
+}
 
-# name             = var.airflow_release_name
-# repository       = "https://charts.bitnami.com/bitnami"
-# chart            = "airflow"
-# version          = "11.0.8"
-# namespace        = var.airflow_namespace
-# create_namespace = true
-# wait             = false
-# values = [file("helm_charts/airflow/values.yaml")]
+variable "s3_versioning" {
+  type = bool
+  description = "Enable versioning for user resources S3 bucket"
+  default = true
+}
+
+variable "databases" {
+    type = map(any)
+}
 
 variable "helm_release_name" {
   type        = string
   description = "helm release name"
+  default     = "bioanalyze-app"
 }
 
 variable "helm_release_repository" {
   type        = string
-  description = "helm release chart repository"
+  description = "helm release chart repository for BioAnalyze deployment"
+  default     = "https://charts.bitnami.com/bitnami"
 }
 
 variable "helm_release_chart" {
   type        = string
-  description = "helm release chart"
+  description = "helm release chart for BioAnalyze deployment"
+  default     = "nginx"
 }
 
 variable "helm_release_namespace" {
   type        = string
-  description = "helm release namespace"
+  description = "helm release namespace for BioAnalyze deployment"
   default     = "default"
 }
 
 variable "helm_release_version" {
   type        = string
-  description = "helm release version"
+  description = "helm release version for BioAnalyze deployment"
+  default     = "9.5.13"
 }
 
 variable "helm_release_wait" {
@@ -84,10 +82,23 @@ variable "helm_release_values_dir" {
   default     = "helm_charts"
 }
 
-variable "helm_release_values_files" {
-  type        = list(string)
-  description = "helm release values files - paths values files to add to helm install --values {}"
-  default     = []
+variable "helm_release_values_file" {
+  type        = string
+  description = "File to put additional values for helm release"
+  default = ""
+}
+
+
+variable "helm_release_values_service_type" {
+  type        = string
+  description = "Service type to set for exposing the airflow service. The default is to use the ClusterIP and an ingress. Alternative is to use a LoadBalancer, but this only recommended for testing."
+  default     = "ClusterIP"
+}
+
+variable "helm_release_values_service_port" {
+  type        = string
+  description = "Service port to set for exposing the nginx service"
+  default     = "80"
 }
 
 ##################################################
@@ -112,11 +123,30 @@ variable "letsencrypt_email" {
 variable "aws_route53_zone_name" {
   type        = string
   description = "Name of the zone to add records. Do not forget the trailing '.' - 'test.com.'"
-  default     = "test.com."
+  default     = "bioanalyzedev.com."
 }
 
 variable "aws_route53_record_name" {
   type        = string
   description = "Record name to add to aws_route_53. Must be a valid subdomain - www,app,etc"
-  default     = "www"
+  default     = "nginx"
+}
+
+variable "helm_release_name_ingress" {
+  type = string
+  default = "nginx"
+}
+
+variable "ingress_class" {
+  type = string
+  default = "nginx"
+}
+
+variable "install_ingress" {
+  type = bool
+}
+
+variable "create_route53_record" {
+  type = bool
+  default = false
 }
