@@ -62,8 +62,8 @@ module "rds_cluster_aurora" {
   source           = "cloudposse/rds-cluster/aws"
   engine_mode      = try(each.value.engine_mode, "provisioned")
   context          = module.this.context
-  cluster_family   = try(each.value.cluster_family, "aurora5.6")
-  engine           = "aurora"
+  cluster_family   = try(each.value.cluster_family, "aurora-postgresql9.6")
+  engine           = try(each.value.engine, "aurora-postgresql")
   cluster_size     = try(each.value.cluster_size, 0)
   admin_user       = try(each.value.admin_user, "admin")
   admin_password   = try(each.value.admin_password, aws_secretsmanager_secret_version.db-pass-val[each.key].secret_string)
