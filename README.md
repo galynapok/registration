@@ -48,6 +48,54 @@
 | [kubernetes_service.bioanalyze-app](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/service) | data source |
 | [kubernetes_service.bioanalyze_ingress](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/service) | data source |
 
+
+## Usage
+
+For a complete example, see [examples/complete](examples/complete).
+
+For automated tests of the complete example using [bats](https://github.com/bats-core/bats-core) and [Terratest](https://github.com/gruntwork-io/terratest) (which tests and deploys the example on AWS), see [test](test).
+
+This example creates a new `String` parameter called `/cp/prod/app/database/master_password` with the value of `password1`.
+
+```hcl
+      module "registration" {
+          source = "./registration"
+          enabled = true
+          name    = "clienta-org"
+          namespace = ""
+          subnets = ["subnet-*", "subnet-*"]
+          vpc_id = "vpc-*"
+          databases = {
+              "airflow" = {
+                  name    = "clienta-org-airflow"
+                  cluster_size              = 2,
+                  create_random_db_password = true,
+                  instance_type             = "db.t2.small",
+                  security_groups           = [],
+                  retention_period          = 5,
+                  backup_window             = "07:00-09:00",
+                  admin_user                = "admin"
+              },
+              "bioanalyze" = {
+                  name    = "clienta-org-bioanalyze"
+                  cluster_size              = 2,
+                  create_random_db_password = true,
+                  instance_type             = "db.t2.small",
+                  security_groups           = [],
+                  retention_period          = 5,
+                  backup_window             = "07:00-09:00",
+                  admin_user                = "admin"
+              }
+          } 
+          enable_ssl = true
+          install_ingress = true
+          helm_release_values_service_type = "LoadBalancer"
+          create_route53_record = true
+      }
+
+```
+
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
