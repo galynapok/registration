@@ -196,5 +196,4 @@ variable "airflow_password" {
 variable "airflow_helm_service_type" {
   type = string
   default = "ClusterIP"
-  
 }

@@ -74,7 +74,7 @@ databese secters, iam user to wit access to created resources.
                   name    = "clienta-org-airflow"
                   cluster_size              = 2,
                   create_random_db_password = true,
-                  instance_type             = "db.t2.small",
+                  instance_type             = "db.t3.medium",
                   security_groups           = [],
                   retention_period          = 5,
                   backup_window             = "07:00-09:00",
@@ -84,7 +84,7 @@ databese secters, iam user to wit access to created resources.
                   name    = "clienta-org-bioanalyze"
                   cluster_size              = 2,
                   create_random_db_password = true,
-                  instance_type             = "db.t2.small",
+                  instance_type             = "db.t3.medium",
                   security_groups           = [],
                   retention_period          = 5,
                   backup_window             = "07:00-09:00",
