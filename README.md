@@ -23,6 +23,7 @@
 |------|--------|---------|
 | <a name="module_aws_user"></a> [aws\_user](#module\_aws\_user) | cloudposse/iam-system-user/aws | 0.22.5 |
 | <a name="module_bioanalyze_ingress"></a> [bioanalyze\_ingress](#module\_bioanalyze\_ingress) | dabble-of-devops-bioanalyze/eks-bitnami-nginx-ingress/aws | >= 0.1.0 |
+| <a name="module_helm_release_airflow"></a> [helm\_release\_airflow](#module\_helm\_release\_airflow) | dabble-of-devops-bioanalyze/eks-bitnami-apache-airflow/aws | n/a |
 | <a name="module_rds_cluster_aurora"></a> [rds\_cluster\_aurora](#module\_rds\_cluster\_aurora) | cloudposse/rds-cluster/aws | n/a |
 | <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | cloudposse/s3-bucket/aws | n/a |
 | <a name="module_terraform_state_backend"></a> [terraform\_state\_backend](#module\_terraform\_state\_backend) | cloudposse/tfstate-backend/aws | n/a |
@@ -38,8 +39,10 @@
 | [aws_secretsmanager_secret.db_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret_version.db-pass-val](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [helm_release.bioanalyze-app](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [null_resource.create_merged_file](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.sleep_bioanalyze_app_update](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_password.password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
+| [random_string.computed_values](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [aws_elb.bioanalyze-app](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/elb) | data source |
 | [aws_elb.bioanalyze_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/elb) | data source |
 | [aws_iam_policy_document.bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
@@ -102,6 +105,15 @@ databese secters, iam user to wit access to created resources.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_additional_tag_map"></a> [additional\_tag\_map](#input\_additional\_tag\_map) | Additional key-value pairs to add to each map in `tags_as_list_of_maps`. Not added to `tags` or `id`.<br>This is for some rare cases where resources want additional configuration of tags<br>and therefore take a list of maps with tag key, value, and additional configuration. | `map(string)` | `{}` | no |
+| <a name="input_airflow_aws_route53_record_name"></a> [airflow\_aws\_route53\_record\_name](#input\_airflow\_aws\_route53\_record\_name) | n/a | `string` | `""` | no |
+| <a name="input_airflow_aws_route53_zone_name"></a> [airflow\_aws\_route53\_zone\_name](#input\_airflow\_aws\_route53\_zone\_name) | n/a | `string` | `""` | no |
+| <a name="input_airflow_enable_ssl"></a> [airflow\_enable\_ssl](#input\_airflow\_enable\_ssl) | n/a | `bool` | `false` | no |
+| <a name="input_airflow_helm_release_version"></a> [airflow\_helm\_release\_version](#input\_airflow\_helm\_release\_version) | n/a | `string` | `"11.0.8"` | no |
+| <a name="input_airflow_helm_service_type"></a> [airflow\_helm\_service\_type](#input\_airflow\_helm\_service\_type) | n/a | `string` | `"ClusterIP"` | no |
+| <a name="input_airflow_helm_values_dir"></a> [airflow\_helm\_values\_dir](#input\_airflow\_helm\_values\_dir) | n/a | `any` | n/a | yes |
+| <a name="input_airflow_password"></a> [airflow\_password](#input\_airflow\_password) | n/a | `string` | `"PASSWORD"` | no |
+| <a name="input_airflow_release_name"></a> [airflow\_release\_name](#input\_airflow\_release\_name) | n/a | `any` | n/a | yes |
+| <a name="input_airflow_use_external_db"></a> [airflow\_use\_external\_db](#input\_airflow\_use\_external\_db) | n/a | `bool` | `true` | no |
 | <a name="input_attributes"></a> [attributes](#input\_attributes) | ID element. Additional attributes (e.g. `workers` or `cluster`) to add to `id`,<br>in the order they appear in the list. New attributes are appended to the<br>end of the list. The elements of the list are joined by the `delimiter`<br>and treated as a single ID element. | `list(string)` | `[]` | no |
 | <a name="input_aws_route53_record_name"></a> [aws\_route53\_record\_name](#input\_aws\_route53\_record\_name) | Record name to add to aws\_route\_53. Must be a valid subdomain - www,app,etc | `string` | `"nginx"` | no |
 | <a name="input_aws_route53_zone_name"></a> [aws\_route53\_zone\_name](#input\_aws\_route53\_zone\_name) | Name of the zone to add records. Do not forget the trailing '.' - 'test.com.' | `string` | `"bioanalyzedev.com."` | no |
@@ -127,6 +139,7 @@ databese secters, iam user to wit access to created resources.
 | <a name="input_helm_release_wait"></a> [helm\_release\_wait](#input\_helm\_release\_wait) | n/a | `bool` | `true` | no |
 | <a name="input_id_length_limit"></a> [id\_length\_limit](#input\_id\_length\_limit) | Limit `id` to this many characters (minimum 6).<br>Set to `0` for unlimited length.<br>Set to `null` for keep the existing setting, which defaults to `0`.<br>Does not affect `id_full`. | `number` | `null` | no |
 | <a name="input_ingress_class"></a> [ingress\_class](#input\_ingress\_class) | n/a | `string` | `"nginx"` | no |
+| <a name="input_install_airflow"></a> [install\_airflow](#input\_install\_airflow) | n/a | `bool` | `true` | no |
 | <a name="input_install_ingress"></a> [install\_ingress](#input\_install\_ingress) | n/a | `bool` | n/a | yes |
 | <a name="input_label_key_case"></a> [label\_key\_case](#input\_label\_key\_case) | Controls the letter case of the `tags` keys (label names) for tags generated by this module.<br>Does not affect keys of tags passed in via the `tags` input.<br>Possible values: `lower`, `title`, `upper`.<br>Default value: `title`. | `string` | `null` | no |
 | <a name="input_label_order"></a> [label\_order](#input\_label\_order) | The order in which the labels (ID elements) appear in the `id`.<br>Defaults to ["namespace", "environment", "stage", "name", "attributes"].<br>You can omit any of the 6 labels ("tenant" is the 6th), but at least one must be present. | `list(string)` | `null` | no |
@@ -153,6 +166,7 @@ databese secters, iam user to wit access to created resources.
 | <a name="output_aws_elb_bioanalyze_app"></a> [aws\_elb\_bioanalyze\_app](#output\_aws\_elb\_bioanalyze\_app) | n/a |
 | <a name="output_bioanalyze_endpoint_lb"></a> [bioanalyze\_endpoint\_lb](#output\_bioanalyze\_endpoint\_lb) | n/a |
 | <a name="output_db_secrets"></a> [db\_secrets](#output\_db\_secrets) | n/a |
+| <a name="output_helm_release_airflow"></a> [helm\_release\_airflow](#output\_helm\_release\_airflow) | n/a |
 | <a name="output_s3_bucket"></a> [s3\_bucket](#output\_s3\_bucket) | n/a |
 | <a name="output_secret_access_key"></a> [secret\_access\_key](#output\_secret\_access\_key) | n/a |
 | <a name="output_user"></a> [user](#output\_user) | n/a |

@@ -1,7 +1,16 @@
 locals {
   ingress_enabled     = var.enable_ssl && var.install_ingress == true  ? 1 : 0
   helm_release_values = var.helm_release_values_file != null && var.helm_release_values_file != "" ? [file(var.helm_release_values_file)] : []
+  helm_release_merged_values_file = abspath("helm_charts/computed-${random_string.computed_values.result}-values.yaml")
+
 } 
+resource "random_string" "computed_values" {
+  length           = 10
+  special          = false
+  lower            = true
+  upper            = false
+  override_special = ""
+}
 
 #########################################################################
 # Terraform state backend with state lock 
@@ -62,7 +71,7 @@ module "rds_cluster_aurora" {
   source           = "cloudposse/rds-cluster/aws"
   engine_mode      = try(each.value.engine_mode, "provisioned")
   context          = module.this.context
-  cluster_family   = try(each.value.cluster_family, "aurora-postgresql9.6")
+  cluster_family   = try(each.value.cluster_family, "aurora-postgresql12")
   engine           = try(each.value.engine, "aurora-postgresql")
   cluster_size     = try(each.value.cluster_size, 0)
   admin_user       = try(each.value.admin_user, "admin")
@@ -74,7 +83,8 @@ module "rds_cluster_aurora" {
   subnets          = var.subnets
   retention_period = try(each.value.retention_period, 5)  
   backup_window    = try(each.value.backup_window, "07:00-09:00")
-  name = each.value.name
+  name             = each.value.name
+  db_port          = try(each.value.db_port, 5432)
 }
 
 
@@ -84,16 +94,16 @@ module "rds_cluster_aurora" {
 
 resource "aws_secretsmanager_secret" "db_secret" {
   for_each = var.databases
-  name = format("%s-%s-aurora-master-pass", var.name, each.key) 
+  name = format("%s-%s-aurora-master-password", var.name, each.key) 
 }
 
 resource "aws_secretsmanager_secret_version" "db-pass-val" {
   for_each = var.databases
    secret_id     = aws_secretsmanager_secret.db_secret[each.key].id
    secret_string = random_password.password[each.key].result
-   lifecycle {
-    ignore_changes = [secret_string]
-  }
+    lifecycle {
+     ignore_changes = [secret_string]
+    }
 }
  
 data "aws_iam_policy_document" "secret" {
@@ -301,4 +311,48 @@ resource "aws_route53_record" "bioanalyze-app" {
     evaluate_target_health = true
   }
 }
+#########################################################################
+# Deploy airflow helm release to EKS
+#########################################################################
 
+resource "null_resource" "create_merged_file" {
+  count    = module.this.enabled ? 1 : 0
+  triggers = {
+    always_run = timestamp()
+  }
+  provisioner "local-exec" {
+    command = <<EOT
+    mkdir -p helm_charts
+    touch ${local.helm_release_merged_values_file}
+    EOT
+  }
+}
+
+
+ module "helm_release_airflow" {
+  count    = module.this.enabled && var.install_airflow ? 1 : 0 
+  depends_on = [
+    null_resource.create_merged_file,
+  ]
+  source                          = "dabble-of-devops-bioanalyze/eks-bitnami-apache-airflow/aws"
+  helm_release_name               = "airflow"
+  helm_release_version            = var.airflow_helm_release_version
+  helm_release_values_dir         = abspath(var.airflow_helm_values_dir)
+  use_external_db                 = var.airflow_use_external_db
+  external_db_secret              = try(aws_secretsmanager_secret_version.db-pass-val["airflow"].secret_string, "") 
+  external_db_host                = try(compact([for item in module.rds_cluster_aurora: try(regexall(".*airflow.*", item.endpoint)[0], "")])[0], "")
+  external_db_user                = try(compact([for item in module.rds_cluster_aurora: length(regexall(".*airflow.*", item.endpoint)) > 0 ? item.master_username : ""])[0], "")
+  helm_release_merged_values_file = local.helm_release_merged_values_file
+  letsencrypt_email               = var.letsencrypt_email
+  aws_route53_zone_name           = var.airflow_aws_route53_zone_name
+  aws_route53_record_name         = var.airflow_aws_route53_record_name
+  enable_ssl                      = var.airflow_enable_ssl
+  context                         = module.this.context
+  helm_release_values_files       = ["helm_charts/airflow_values.yaml"]
+  airflow_password                = var.airflow_password
+  helm_release_values_service_type = var.airflow_helm_service_type
+}
+
+output "helm_release_airflow" {
+  value = module.helm_release_airflow
+}

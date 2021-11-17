@@ -76,48 +76,16 @@ references:
 
 # How to use this module. Should be an easy example to copy and paste.
 usage: |-
-  For a complete example, see [examples/complete](examples/complete).
-
-  For automated tests of the complete example using [bats](https://github.com/bats-core/bats-core) and [Terratest](https://github.com/gruntwork-io/terratest)
-  (which tests and deploys the example on AWS), see [test](test).
-
   ```hcl
-      module "registration" {
-          source = "./registration"
-          enabled = true
-          name    = "clienta-org"
-          namespace = ""
-          subnets = ["subnet-35771e1b", "subnet-801a78e7"]
-          vpc_id = "vpc-8514abff"
-          databases = {
-              "airflow" = {
-                  name    = "clienta-org-airflow"
-                  cluster_size              = 2,
-                  create_random_db_password = true,
-                  instance_type             = "db.t2.small",
-                  security_groups           = [],
-                  retention_period          = 5,
-                  backup_window             = "07:00-09:00",
-                  admin_user                = "admin"
-              },
-              "bioanalyze" = {
-                  name    = "clienta-org-bioanalyze"
-                  cluster_size              = 2,
-                  create_random_db_password = true,
-                  instance_type             = "db.t2.small",
-                  security_groups           = [],
-                  retention_period          = 5,
-                  backup_window             = "07:00-09:00",
-                  admin_user                = "admin"
-              }
-          } 
-          enable_ssl = true
-          install_ingress = true
-          helm_release_values_service_type = "LoadBalancer"
-          create_route53_record = true
-      }
+  module "circleci" {
+    source = "cloudposse/iam-system-user/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version     = "x.x.x"
+    namespace  = "eg"
+    stage      = "circleci"
+    name       = "assets"
+  }
   ```
-
 # Example usage
 examples: |-
   Here is an example of using this module:
